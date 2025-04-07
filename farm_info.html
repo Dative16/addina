@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fomu ya Usajili - Ushindi Pamoja</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      background-color: #f9f9f9;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    h1 {
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+      color: #333;
+    }
+    .section {
+      margin-bottom: 2rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .checkbox-group {
+      margin-bottom: 1rem;
+    }
+    .checkbox-group label {
+      font-weight: normal;
+      display: flex;
+      align-items: center;
+    }
+    .checkbox-group input {
+      margin-right: 0.5rem;
+    }
+    button {
+      background-color: #3b82f6;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:hover {
+      background-color: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Fomu ya Usajili ya Jumuiya ya Wakulima – Ushindi Pamoja (SteboFarm)</h1>
+    <p>Karibu kwenye Ushindi Pamoja, jumuiya ya wakulima iliyoanzishwa na SteboFarm. Tunasimamia kukuza maarifa na ustawi wa wakulima kwa kutumia kilimo cha kiasili na endelevu. Tafadhali jaza fomu hii ili kujiunga na jumuiya yetu na kupata msaada wa kilimo bora na fursa za kukuza biashara yako.</p>
+
+    <form>
+      <div class="section">
+        <h2>Taarifa Zako za Kimsingi</h2>
+        <label for="jina">1. Jina Kamili:</label>
+        <input type="text" id="jina" name="jina" required />
+
+        <label>2. Jinsia:</label>
+        <div class="checkbox-group">
+          <label><input type="radio" name="jinsia" value="Kiume"> Kiume</label>
+          <label><input type="radio" name="jinsia" value="Kike"> Kike</label>
+          <label><input type="radio" name="jinsia" value="Nyingine"> Nyingine</label>
+        </div>
+
+        <label for="umri">3. Umri:</label>
+        <input type="number" id="umri" name="umri" />
+
+        <label for="email">4. E-mail (Ikiwa Inapatikana):</label>
+        <input type="email" id="email" name="email" />
+
+        <label for="simu">5. Nambari ya Simu:</label>
+        <input type="text" id="simu" name="simu" required />
+      </div>
+
+      <div class="section">
+        <h2>Taarifa ya Kilimo</h2>
+
+        <label for="eneo">6. Eneo la Kilimo (Wilaya na Mkoa):</label>
+        <input type="text" id="eneo" name="eneo" />
+
+        <label>7. Aina ya Mazao Unayolima:</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" name="mazao" value="Mahindi"> Mahindi</label>
+          <label><input type="checkbox" name="mazao" value="Mpunga"> Mpunga</label>
+          <label><input type="checkbox" name="mazao" value="Viazi"> Viazi</label>
+          <label><input type="checkbox" name="mazao" value="Mengine"> Mazao mengine (Taja):</label>
+          <input type="text" name="mazao_mengine" placeholder="Taja hapa..." />
+        </div>
+
+        <label>8. Je, unatumia mbegu za kiasili au za kisasa?</label>
+        <div class="checkbox-group">
+          <label><input type="radio" name="mbegu" value="Kiasili"> Kiasili</label>
+          <label><input type="radio" name="mbegu" value="Kisasa"> Kisasa</label>
+          <label><input type="radio" name="mbegu" value="Mchanganyiko"> Mchanganyiko</label>
+        </div>
+
+        <label>9. Unatumia mbolea za asili au za kemikali?</label>
+        <div class="checkbox-group">
+          <label><input type="radio" name="mbolea" value="Asili"> Asili</label>
+          <label><input type="radio" name="mbolea" value="Kemikali"> Kemikali</label>
+          <label><input type="radio" name="mbolea" value="Mchanganyiko"> Mchanganyiko</label>
+        </div>
+
+        <label>10. Je, umeshawahi kushiriki mafunzo ya kilimo bora au kilimo cha asili?</label>
+        <div class="checkbox-group">
+          <label><input type="radio" name="mafunzo" value="Ndiyo"> Ndiyo</label>
+          <label><input type="radio" name="mafunzo" value="Hapana"> Hapana</label>
+        </div>
+
+        <label for="elezo">Ikiwa ndiyo, tafadhali eleza mafunzo uliyoshiriki:</label>
+        <textarea name="elezo" id="elezo" rows="3"></textarea>
+      </div>
+
+      <label>11. Nini kipaumbele chako katika kilimo?</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox"> Kuongeza uzalishaji</label>
+      <label><input type="checkbox"> Kuboresha ubora wa mazao</label>
+      <label><input type="checkbox"> Kupunguza matumizi ya kemikali</label>
+      <label><input type="checkbox"> Kuanzisha kilimo endelevu</label>
+      <label><input type="checkbox"> Nyingine (Taja)</label>
+      <input type="text" name="kipaumbele_nyingine">
+    </div>
+
+    <label>12. Je, unahitaji msaada gani kutoka kwa Ushindi Pamoja?</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox"> Mafunzo ya kilimo bora</label>
+      <label><input type="checkbox"> Ushauri wa kiufundi</label>
+      <label><input type="checkbox"> Masoko ya mazao</label>
+      <label><input type="checkbox"> Upatikanaji wa mbegu bora</label>
+      <label><input type="checkbox"> Msaada wa kifedha</label>
+      <label><input type="checkbox"> Nyingine (Taja)</label>
+      <input type="text" name="msaada_nyingine">
+    </div>
+
+    <h2>Taarifa za Ziada:</h2>
+
+    <label>13. Je, unapenda kuwa sehemu ya vikundi vya wakulima kwa kushirikiana na wenzako ili kukuza biashara?</label>
+    <div class="checkbox-group">
+      <label><input type="radio" name="kujiunga" value="ndiyo"> Ndiyo</label>
+      <label><input type="radio" name="kujiunga" value="happana"> Hapana</label>
+      
+    </div>
+    <label>14. Je, unahitaji msaada wa kifedha kwa ajili ya kilimo?</label>
+    <div class="checkbox-group">
+        <label><input type="radio" name="msaada_kifedha" value="ndiyo"> Ndiyo</label>
+        <label><input type="radio" name="msaada_kifedha" value="hapana"> Hapana</label>
+    </div>
+    <label>15. Tafadhali eleza kwa kifupi kuhusu changamoto unazokutana nazo katika kilimo:</label>
+    <textarea name="changamoto" id="changamoto" rows="3"></textarea>
+    <label>16. Tafadhali eongeza Maoni yako au maswali yoyote unayohitaji kuuliza</label>
+    <textarea name="changamoto" id="changamoto" rows="3"></textarea>
+        
+
+
+      <button type="submit">Tuma Maombi</button>
+    </form>
+  </div>
+</body>
+</html>

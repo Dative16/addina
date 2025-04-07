@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ushindi Pamoja - Login & Signup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      background-color: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .auth-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #1f2937;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #374151;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #10b981;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #059669;
+    }
+    .toggle {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .toggle a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container" id="login-form">
+    <h2>Ingia</h2>
+    <form>
+      <label for="login-email">Barua Pepe</label>
+      <input type="email" id="login-email" required>
+
+      <label for="login-password">Nenosiri</label>
+      <input type="password" id="login-password" required>
+
+      <button type="submit">Ingia</button>
+      <div class="toggle">
+        <p>Huna akaunti? <a href="#" onclick="toggleForms('signup')">Jisajili hapa</a></p>
+      </div>
+    </form>
+  </div>
+
+  <div class="auth-container" id="signup-form" style="display: none;">
+    <h2>Jisajili</h2>
+    <form>
+      <label for="signup-name">Jina Kamili</label>
+      <input type="text" id="signup-name" required>
+
+      <label for="signup-email">Barua Pepe</label>
+      <input type="email" id="signup-email" required>
+
+      <label for="signup-password">Nenosiri</label>
+      <input type="password" id="signup-password" required>
+
+      <button type="submit">Jisajili</button>
+      <div class="toggle">
+        <p>Tayari una akaunti? <a href="#" onclick="toggleForms('login')">Ingia hapa</a></p>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function toggleForms(form) {
+      const loginForm = document.getElementById('login-form');
+      const signupForm = document.getElementById('signup-form');
+
+      if (form === 'signup') {
+        loginForm.style.display = 'none';
+        signupForm.style.display = 'block';
+      } else {
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
