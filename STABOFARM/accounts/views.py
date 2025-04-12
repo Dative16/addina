@@ -22,7 +22,7 @@ from django.core.mail import EmailMessage
 def home(request):
     products = Product.objects.all().filter(is_available=True)
     context = {'products': products, }
-    return render(request, 'account/home.html', context)
+    return render(request, 'store/index.html', context)
 
 
 def register(request):
@@ -42,7 +42,7 @@ def register(request):
             # user activation
             current_site = get_current_site(request)
             mail_subject = 'Please activate your account'
-            message = render_to_string('account/account_verification_email.html', {
+            message = render_to_string('auth/account_verification_email.html', {
                 'user': user,
                 'domain': current_site,
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
@@ -56,7 +56,7 @@ def register(request):
     context = {
         'form': form,
     }
-    return render(request, 'account/register.html', context)
+    return render(request, 'auth/auth.html', context)
 
 
 def login(request):
@@ -121,7 +121,7 @@ def login(request):
         else:
             messages.error(request, 'Invalid login credentials')
             return redirect('login')
-    return render(request, 'account/login.html')
+    return render(request, 'auth/auth.html')
 
 
 @login_required(login_url='login')

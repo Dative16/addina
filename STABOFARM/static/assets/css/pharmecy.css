@@ -126,9 +126,9 @@ h6, i[class^=flaticon-], .body__overlay {
   */
   --clr-common-white: #fff;
   --clr-common-black: #000;
-  --clr-common-placeholder: #808080;
+  --clr-common-placeholder: #b8802c;
   --clr-common-heading: #191919;
-  --clr-common-body-text: #555555;
+  --clr-common-body-text: #533c1d;
   --clr-common-selection: #262626;
   --clr-common-body: #fff;
   --clr-theme-primary: #02afe5;
@@ -136,9 +136,9 @@ h6, i[class^=flaticon-], .body__overlay {
   --clr-theme-grocery: #80b501;
   --clr-text-primary: #fff;
   --clr-text-secondary: #161616;
-  --clr-text-body: #555555;
+  --clr-text-body: #533c1d;;
   --clr-text-2: #222222;
-  --clr-text-3: #9f9f9f;
+  --clr-text-3: #868686;
   --clr-text-4: #808080;
   --clr-bg-1: #f0f0f0;
   --clr-bg-2: #191919;

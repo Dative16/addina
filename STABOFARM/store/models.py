@@ -145,6 +145,7 @@ class ReviewRating(models.Model):
 
 
 class ProductGallery(models.Model):
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, default=None)
     product = models.ForeignKey(Product, default=None, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='store/products', max_length=255)
 

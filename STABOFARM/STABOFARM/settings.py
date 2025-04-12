@@ -42,8 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'account',
-    'category',
+    'accounts',
     'store',
     'carts',
     'orders',
@@ -64,7 +63,7 @@ ROOT_URLCONF = 'STABOFARM.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -73,8 +72,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'store.context_processors.men_link',
-                'store.context_processors.get_shop'
-                'cart.context_processors.counter',
+                # 'store.context_processors.get_shop'
+                # 'cart.context_processors.counter',
             ],
         },
     },

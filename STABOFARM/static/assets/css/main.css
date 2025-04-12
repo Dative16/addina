@@ -131,9 +131,10 @@ h6, i[class^=flaticon-], .body__overlay {
   --clr-common-body-text: #555555;
   --clr-common-selection: #262626;
   --clr-common-body: #fff;
-  --clr-theme-primary: #b18b5e;
-  --clr-theme-secondary: #b18b5e;
-  --clr-theme-grocery: #b18b5e;
+  --clr-theme-primary: #e97b14;
+  --clr-theme-secondary: #e97b14;
+  /* --clr-theme-secondary: #b18b5e; */
+  --clr-theme-grocery: #e97b14;
   --clr-text-primary: #fff;
   --clr-text-secondary: #161616;
   --clr-text-body: #555555;
