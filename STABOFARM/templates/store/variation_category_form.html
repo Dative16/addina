@@ -1,0 +1,24 @@
+
+{% extends "main/dashboard_side.html" %}
+
+{% load static %}
+{% block title %}Create Variation Category{% endblock title %}
+
+
+{% block content %}
+<div class="dashboard-content">
+<div class="form-container">
+
+    <h2>{% if object %}Edit{% else %}Create{% endif %} Variation Category</h2>
+    <form method="post" id="variationCategoryForm">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Category Name</label>
+            <input type="text" name="name" value="{{ object.name|default:'' }}" required>
+        </div>
+        <button type="submit" class="btn-primary">Save Category</button>
+    </form>
+</div>
+</div>
+
+{% endblock %}

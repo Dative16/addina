@@ -27,7 +27,7 @@ def home(request):
 
 def register(request):
     if request.method == 'POST':
-        form = RegistrationForm(request.POST)
+        form = RegistrationForm(data=request.POST)
         if form.is_valid():
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
@@ -51,6 +51,7 @@ def register(request):
             to_email = email
             send_email = EmailMessage(mail_subject, message, to=[to_email])
             send_email.send()
+            
     else:
         form = RegistrationForm()
     context = {
@@ -117,7 +118,7 @@ def login(request):
                     nextPage = params['next']
                     return redirect(nextPage)
             except:
-                return redirect('dashboard')
+                return redirect('home')
         else:
             messages.error(request, 'Invalid login credentials')
             return redirect('login')
@@ -150,15 +151,15 @@ def activate(request, uidb64, token):
 
 @login_required(login_url='login')
 def dashboard(request):
-    orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
-    orders_count = orders.count()
+    # orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
+    # orders_count = orders.count()
 
-    userprofile = UserProfile.objects.get(user_id=request.user.id)
-    context = {
-        'orders_count': orders_count,
-        'userprofile': userprofile,
-    }
-    return render(request, 'account/dashboard.html', context)
+    # userprofile = UserProfile.objects.get(user_id=request.user.id)
+    # context = {
+    #     'orders_count': orders_count,
+    #     'userprofile': userprofile,
+    # }
+    return render(request, 'main/dashboard.html')
 
 
 def forgotPassword(request):
@@ -170,7 +171,7 @@ def forgotPassword(request):
             # Reset password email
             current_site = get_current_site(request)
             mail_subject = 'Reset Your Password'
-            message = render_to_string('account/reset_password_email.html', {
+            message = render_to_string('auth/reset_password_email.html', {
                 'user': user,
                 'domain': current_site,
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
@@ -185,7 +186,7 @@ def forgotPassword(request):
         else:
             messages.error(request, 'Account does not exist!')
             return redirect('forgotPassword')
-    return render(request, 'account/forgotPassword.html')
+    return render(request, 'auth/forgotPassword.html')
 
 
 def resetpassword_validate(request, uidb64, token):
@@ -220,16 +221,9 @@ def resetPassword(request):
             messages.error(request, 'Password do not match!')
             return redirect('resetPassword')
     else:
-        return render(request, 'account/resetPassword.html')
+        return render(request, 'auth/resetPassword.html')
 
 
-@login_required(login_url='login')
-def my_orders(request):
-    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
-    context = {
-        'orders': orders,
-    }
-    return render(request, 'account/my_orders.html', context)
 
 
 @login_required(login_url='login')
@@ -251,7 +245,8 @@ def edit_profile(request):
         'profile_form': profile_form,
         'userprofile': userprofile,
     }
-    return render(request, 'account/edit_profile.html', context)
+    return render(request, 'auth/edit_profile.html', context)
+
 
 
 @login_required(login_url='login')
@@ -277,7 +272,18 @@ def change_password(request):
         else:
             messages.error(request, 'Password does not match!')
             return redirect('change_password')
-    return render(request, 'account/change_password.html')
+    return render(request, 'auth/change_password.html')
+
+
+
+
+@login_required(login_url='login')
+def my_orders(request):
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'account/my_orders.html', context)
 
 
 @login_required(login_url='login')

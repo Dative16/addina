@@ -1,0 +1,30 @@
+
+{% extends "main/dashboard_side.html" %}
+
+{% load static %}
+{% block title %}Delete Product{% endblock title %}
+
+
+{% block content %}
+<div class="dashboard-content">
+<div class="form-container">
+<div class="delete-confirmation">
+    <h2>Delete Product</h2>
+    <p>Are you sure you want to delete "{{ object.product_name }}"?</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="confirmation-actions">
+            <a href="{% url 'product_detail' object.pk %}" class="btn-secondary">
+                Cancel
+            </a>
+            <button type="submit" class="btn-danger">
+                <span class="material-symbols-rounded">delete</span>
+                Confirm Delete
+            </button>
+        </div>
+    </form>
+</div>
+</div>
+</div>
+{% endblock %}

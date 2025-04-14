@@ -1,0 +1,63 @@
+
+{% extends "main/dashboard_side.html" %}
+
+{% load static %}
+{% block title %}Create Variation {% endblock title %}
+
+
+{% block content %}
+<div class="dashboard-content">
+<div class="form-container">
+    <h2>{% if object %}Edit{% else %}Create{% endif %} Variation</h2>
+    <form method="post" id="variationForm">
+        {% csrf_token %}
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Category</label>
+                <div class="dynamic-select">
+                    <select name="variation_category" id="id_category" required>
+                        <option value="">Select Category</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" 
+                            {% if object.variation_category.id == category.id %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="btn-small" id="addCategoryBtn">
+                        <span class="material-symbols-rounded">add</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Value</label>
+                <input type="text" name="variation_value" 
+                    value="{{ object.variation_value|default:'' }}" required>
+            </div>
+
+            <div class="form-group switch-group">
+                <label class="switch">
+                    <input type="checkbox" name="is_active" 
+                        {% if object.is_active or not object %}checked{% endif %}>
+                    <span class="slider"></span>
+                </label>
+                <span class="switch-label">Active</span>
+            </div>
+        </div>
+        <button type="submit" class="btn-primary">Save Variation</button>
+    </form>
+</div>
+
+<div id="categoryModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>New Variation Category</h3>
+        <form id="newCategoryForm">
+            <input type="text" name="name" placeholder="Category Name" required>
+            <button type="submit" class="btn-primary">Create</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

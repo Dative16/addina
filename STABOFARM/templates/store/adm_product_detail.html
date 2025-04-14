@@ -1,0 +1,115 @@
+
+{% extends "main/dashboard_side.html" %}
+
+{% load static %}
+{% block title %}{{ product.product_name }}{% endblock title %}
+
+{% block content %}
+<div class="dashboard-content">
+<div class="form-container">
+<div class="product-detail-container">
+    <div class="detail-header">
+        <h2>{{ product.product_name }}</h2>
+        <div class="header-actions">
+            <a href="{% url 'product_edit' product.pk %}" class="btn-primary">
+                <span class="material-symbols-rounded">edit</span>
+                Edit Product
+            </a>
+        </div>
+    </div>
+
+    <div class="product-detail-grid">
+        <!-- Main Product Info -->
+        <div class="product-main">
+            <div class="product-gallery">
+                <div class="main-image">
+                    <img src="{{ product.image.url }}" alt="{{ product.product_name }}">
+                </div>
+                <div class="thumbnail-grid">
+                    {% for image in gallery %}
+                    <img src="{{ image.image.url }}" class="thumbnail" alt="Product image {{ forloop.counter }}">
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="product-meta">
+                <div class="meta-card">
+                    <h3>Basic Information</h3>
+                    <dl>
+                        <dt>Price</dt>
+                        <dd>${{ product.price }}</dd>
+                        
+                        <dt>Cost Price</dt>
+                        <dd>${{ product.buy_price }}</dd>
+                        
+                        <dt>Stock</dt>
+                        <dd>{{ product.stock }} units</dd>
+                        
+                        <dt>Expiration Date</dt>
+                        <dd>{{ product.expire_date|default:"-" }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Variations & Details -->
+        <div class="product-details">
+            <div class="detail-tabs">
+                <div class="tab active" data-target="variations">Variations</div>
+                <div class="tab" data-target="reviews">Reviews ({{ reviews.count }})</div>
+                <div class="tab" data-target="stats">Statistics</div>
+            </div>
+
+            <div class="tab-content active" id="variations">
+                <table class="variation-table">
+                    <thead>
+                        <tr>
+                            <th>Variation</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for variation in variations %}
+                        <tr>
+                            <td>{{ variation.get_full }}</td>
+                            <td>+${{ variation.price }}</td>
+                            <td>{{ variation.stock }}</td>
+                            <td>
+                                <span class="status-badge {% if variation.is_active %}active{% else %}inactive{% endif %}">
+                                    {% if variation.is_active %}Active{% else %}Disabled{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">No variations found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tab-content" id="reviews">
+                {% for review in reviews %}
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="rating">
+                            {% for _ in "12345" %}
+                            <span class="star{% if forloop.counter <= review.rating %} filled{% endif %}">★</span>
+                            {% endfor %}
+                        </div>
+                        <span class="review-date">{{ review.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <h4>{{ review.subject }}</h4>
+                    <p>{{ review.review }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{% endblock %}

@@ -35,7 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
+    # 'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -73,7 +73,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'store.context_processors.men_link',
                 # 'store.context_processors.get_shop'
-                # 'cart.context_processors.counter',
+                'carts.context_processors.counter',
             ],
         },
     },
@@ -139,6 +139,12 @@ STATICFILES_DIRS = [
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+
+
+MESSAGE_TAGS = {
+    messages.ERROR: "danger",
+
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

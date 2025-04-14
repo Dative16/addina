@@ -1,0 +1,51 @@
+{% extends "main/dashboard_side.html" %}
+{% load static %}
+{% block title %}Create New Category- {{request.user.username}}{% endblock title %}
+
+{% block content %}
+
+    <div class="dashboard-content">
+        <div class="form-container">
+<div class="category-list-container">
+    <div class="list-header">
+        <h2>Product Categories</h2>
+        <a href="{% url 'category_create' %}" class="btn-primary">
+            <span class="material-symbols-rounded">add</span>
+            New Category
+        </a>
+    </div>
+
+    <div class="category-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Parent Category</th>
+                    <th>Slug</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td>{{ category.category_name }}</td>
+                    <td>{{ category.parent.category_name|default:"-" }}</td>
+                    <td>{{ category.slug }}</td>
+                    <td>
+                        <a href="{% url 'category_edit' category.pk %}" class="btn-edit">
+                            Edit
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No categories found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+</div>
+{% endblock %}

@@ -1,4 +1,5 @@
 {% load static %}
+
 <!doctype html>
 <html class="no-js" lang="zxx">
 
@@ -8,9 +9,8 @@
    <title>StaboFarm | {% block title %}{% endblock title %}</title>
    <meta name="description" content="">
    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-
    <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/imgs/favicon.png' %}">
+ 
 
    <!-- CSS here -->
    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
@@ -202,7 +202,7 @@
                       <span class="header-setting-toggle text-white" id="header-setting-toggle">Setting</span>
                       <ul>
                          <li>
-                            <a class="furniture-clr-hover" href="dashboard.html">My Profile</a>
+                            <a class="furniture-clr-hover" href="{% url 'dashboard' %}">My Profile</a>
                          </li>
                          <li>
                             <a class="furniture-clr-hover" href="wishlist.html">Wishlist</a>
@@ -211,7 +211,7 @@
                             <a class="furniture-clr-hover" href="cart.html">Cart</a>
                          </li>
                          <li>
-                            <a class="furniture-clr-hover" href="auth.html">Logout</a>
+                            <a class="furniture-clr-hover" href="{% url 'logout' %}">Logout</a>
                          </li>
                       </ul>
                    </div>
@@ -346,6 +346,7 @@
        </div>
     </div>
  </header>
+ {% include "main/alter.html" %}
 {% block content %}
 {% endblock content %}
 
@@ -433,7 +434,7 @@
           <div class="footer-copyright-wrapper">
              <div class="footer-copyright-text">
                 <p class="mb-0">© All Copyright <script> document.write(new Date().getFullYear())</script> by <a target="_blank" class="furniture-clr-hover"
-                      href="#">StaboFarm</a></p>
+                      href="{% url 'home' %}">StaboFarm</a></p>
              </div>
              <div class="footer-payment d-flex align-items-center gap-2">
                 <div class="footer-payment-item mb-0">

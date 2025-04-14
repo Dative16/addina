@@ -8,7 +8,7 @@ from accounts.models import Account
 class Shop(models.Model):
     name = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=250, unique=True)
-    user  = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
+    user  = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, related_name='shops')
     location = models.CharField(max_length=200, blank=True)
     description = models.TextField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -32,7 +32,11 @@ class Shop(models.Model):
 
 
 class Category(models.Model):
-    category_name = models.CharField(max_length=100, unique=True)
+    parent = models.ForeignKey('self', 
+                              on_delete=models.SET_NULL, 
+                              null=True, 
+                              blank=True)
+    category_name = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(max_length=300, blank=True)
     cat_image = models.ImageField(upload_to='photos/category', blank=True)
@@ -55,7 +59,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     product_name = models.CharField(max_length=200)
-    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='products')
     slug = models.SlugField(max_length=500, unique=True)
     description = models.TextField(max_length=500, blank=True)
     price = models.DecimalField(max_digits=100, decimal_places=2)
@@ -155,3 +159,6 @@ class ProductGallery(models.Model):
     class Meta:
         verbose_name = 'productgallery'
         verbose_name_plural = 'product gallery'
+        
+
+

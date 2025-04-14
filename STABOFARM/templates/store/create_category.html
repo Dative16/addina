@@ -1,0 +1,40 @@
+
+{% extends "main/dashboard_side.html" %}
+
+{% load static %}
+{% block title %}Create Product{% endblock title %}
+
+
+{% block content %}
+<div class="dashboard-content">
+<div class="form-container">
+<div class="category-form-container">
+    <h2>Manage Categories</h2>
+    <form method="post" id="categoryForm">
+        {% csrf_token %}
+        
+        <div class="dynamic-category-input">
+            <div class="combo-box">
+                <input type="text" 
+                       id="categorySearch" 
+                       class="form-control"
+                       placeholder="Type to search or create new category">
+                <div class="dropdown-arrow">
+                    <span class="material-symbols-rounded">arrow_drop_down</span>
+                </div>
+                <div class="suggestions-container"></div>
+            </div>
+            {{ form.new_category }}
+            {{ form.category_name }}
+            {{ form.parent }}
+        </div>
+
+        <button type="submit" class="btn-primary">
+            <span class="material-symbols-rounded">save</span>
+            Save Category
+        </button>
+    </form>
+</div>
+</div>
+<div>
+{% endblock %}

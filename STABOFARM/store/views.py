@@ -7,10 +7,10 @@ from datetime import date, timedelta
 from django.utils import timezone
 from accounts.models import Account
 from carts.models import DiscountRule
-from .models import Category,Product, Shop, Variation, VariationCategory, ProductVariation
+from .models import Category,Product, ProductGallery, ReviewRating, Shop, Variation, VariationCategory, ProductVariation
 from orders.models import Order
 from django.contrib import messages
-from .forms import ProductForm, ProductEditForm, ProductVariationForm
+from .forms import ProductForm, ProductVariationForm
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
@@ -21,10 +21,17 @@ from django.core.mail import EmailMessage
 
 from django.db.models import Sum
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import pandas as pd
 
-@login_required(login_url='login')
+from django.views.generic import CreateView, UpdateView, ListView, DetailView, DeleteView
+from .models import Product
+from .forms import ProductForm, DynamicCategoryForm
+from django.urls import reverse_lazy
+from django.http import JsonResponse
+from .models import VariationCategory, Variation, ProductVariation
+
+
 def store(request, category_slug=None):
     shop = Shop.objects.get(user=request.user)
     categories = None
@@ -66,7 +73,7 @@ def search(request):
     }
     return render(request, 'store/store.html', context)
 
-@login_required(login_url='login')
+@login_required(login_url='accounts/login')
 def create_shop(request):
     if request.method == 'POST':   
         name = request.POST['name']
@@ -78,57 +85,167 @@ def create_shop(request):
     
     return render(request, 'store/create_shop.html')
 
-@login_required(login_url='login')
-def create_product(request):
-    categories = Category.objects.all()
-    form = ProductForm()
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            # image = form.cleaned_data['image']
-            product_name = form.cleaned_data['product_name']
-            price = form.cleaned_data['price']
-            stock  = form.cleaned_data['stock']
-            expire_date = form.cleaned_data['expire_date']
-            buy_price  = form.cleaned_data['buy_price']
-            description = form.cleaned_data['description']
-           
-            image = request.FILES.get('image')
-            print("Uploaded Image:",image)
-            input_category = request.POST['category']
 
-            category = Category.objects.get_or_create(category_name=input_category)
+class ProductCreateView(CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'store/create_product.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.shops.exists():
+            messages.warning(request, 'You need to create a shop first')
+            return redirect('shop_create')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
+    def form_valid(self, form):
+        form.instance.shop = form.cleaned_data['shop']
+        return super().form_valid(form)
+
+class ProductUpdateView(UpdateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'store/create_product.html'
+
+
+class ShopCreateView(CreateView):
+    model = Shop
+    fields = ['name', 'location', 'description']
+    template_name = 'store/shop_form.html'
+    
+    def form_valid(self, form):
+        if not self.request.user.is_authenticated:
+            return redirect('login')
+            
+        # Check if shop name already exists
+        if Shop.objects.filter(name__iexact=form.cleaned_data['name']).exists():
+            form.add_error('name', 'Shop with this name already exists')
+            return self.form_invalid(form)
+            
+        shop = form.save(commit=False)
+        shop.user = self.request.user
+        shop.save()
         
-            shop = Shop.objects.get(user=request.user)
-            print(category)
-            product = Product.objects.create(product_name=product_name, shop=shop, description=description, 
-                                            price=price, image=image, stock=stock, category=category[0], buy_price=buy_price, expire_date=expire_date)
-            product.save()
-            messages.success(request, 'Product has been created Successful')
-            return redirect('home')
-    context = {
-        'form': form,
-        'categories': categories,
-    }
-    return render(request, 'store/create_product.html', context)
+        messages.success(self.request, 'Shop created successfully!')
+        return redirect('product_create')
 
-def edit_product(request, product_id):
-    product = Product.objects.get(id=product_id)
-    if request.method == 'POST':
-        form = ProductEditForm(request.POST, request.FILES, instance=product)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Product Has been Updated.')
-            return redirect('store')
-    else:
 
-        form = ProductEditForm(instance=product)
-    context={
-        'form':form,
-        'product': product,
-    }
-    return render(request, 'store/update_product.html', context)
+class ShopUpdateView(UpdateView):
+    model = Shop
+    fields = ['name', 'location', 'description']
+    template_name = 'store/shop_form.html'
+    
+    def get_queryset(self):
+        return Shop.objects.filter(user=self.request.user)
 
+def category_autocomplete(request):
+    """Handle AJAX requests for category suggestions"""
+    search = request.GET.get('search', '')
+    categories = Category.objects.filter(
+        category_name__icontains=search
+    )[:10]
+    
+    results = [{
+        'id': cat.id,
+        'category_name': cat.category_name,
+        'parent': {'id': cat.parent.id, 'category_name': cat.parent.category_name} if cat.parent else None
+    } for cat in categories]
+    
+    return JsonResponse(results, safe=False)
+
+class CategoryCreateView(CreateView):
+    model = Category
+    form_class = DynamicCategoryForm
+    template_name = 'store/create_category.html'
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'Category "{self.object.category_name}" created successfully')
+        return response
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Error creating category. Please check the form.')
+        return super().form_invalid(form)
+
+class CategoryUpdateView(UpdateView):
+    model = Category
+    form_class = DynamicCategoryForm
+    template_name = 'store/create_category.html'
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'Category "{self.object.category_name}" updated successfully')
+        return response
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Error updating category. Please check the form.')
+        return super().form_invalid(form)
+
+def category_list(request):
+    """View to list all categories"""
+    categories = Category.objects.all().prefetch_related('parent')
+    return render(request, 'store/category_list.html', {
+        'categories': categories
+    })
+
+
+
+class VariationCategoryCreateView(CreateView):
+    model = VariationCategory
+    fields = ['name']
+    template_name = 'store/variation_category_form.html'
+    success_url = reverse_lazy('variation_category_list')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'id': self.object.id,
+                'name': self.object.name
+            })
+        return response
+
+class VariationCategoryListView(ListView):
+    model = VariationCategory
+    template_name = 'store/variation_category_list.html'
+    context_object_name = 'categories'
+
+class VariationCreateView(CreateView):
+    model = Variation
+    fields = ['variation_category', 'variation_value', 'is_active']
+    template_name = 'store/variation_form.html'
+    success_url = reverse_lazy('variation_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = VariationCategory.objects.all()
+        return context
+
+class VariationListView(ListView):
+    model = Variation
+    template_name = 'store/variation_list.html'
+    context_object_name = 'variations'
+
+class ProductVariationCreateView(CreateView):
+    model = ProductVariation
+    fields = ['product', 'variations', 'price', 'stock', 'is_active']
+    template_name = 'store/product_variation_form.html'
+    success_url = reverse_lazy('product_variation_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['products'] = Product.objects.all()
+        context['variations'] = Variation.objects.filter(is_active=True)
+        return context
+
+class ProductVariationListView(ListView):
+    model = ProductVariation
+    template_name = 'store/product_variation_list.html'
+    context_object_name = 'product_variations'
 
 def select_shop(request):
     shops = Shop.objects.all()
@@ -230,6 +347,61 @@ def expire_soon_products(request):
         'products': paged_products
     }
     return render(request, 'store/expiring_products.html', context)
+
+
+class ProductListView(ListView):
+    model = Product
+    template_name = 'store/adm_product_list.html'
+    context_object_name = 'products'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # Filter products by the user's shop (assuming shop is linked to user)
+        queryset = queryset.filter(shop=self.request.user.shop)
+        
+        # Add search functionality
+        search_query = self.request.GET.get('search')
+        if search_query:
+            queryset = queryset.filter(
+                Q(product_name__icontains=search_query) |
+                Q(description__icontains=search_query) |
+                Q(category__category_name__icontains=search_query)
+            )
+        return queryset.order_by('-modified_date')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add search query to context
+        context['search_query'] = self.request.GET.get('search', '')
+        # Add counts for dashboard
+        context['total_products'] = Product.objects.filter(shop=self.request.user.shop).count()
+        context['active_products'] = Product.objects.filter(shop=self.request.user.shop, is_available=True).count()
+        return context
+
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'store/adm_product_detail.html'
+    context_object_name = 'product'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['variations'] = ProductVariation.objects.filter(product=self.object)
+        context['reviews'] = ReviewRating.objects.filter(product=self.object)
+        context['gallery'] = ProductGallery.objects.filter(product=self.object)
+        return context
+
+class ProductDeleteView(DeleteView):
+    model = Product
+    template_name = 'store/product_confirm_delete.html'
+    success_url = reverse_lazy('product_list')
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, "Product deleted successfully")
+        return super().delete(request, *args, **kwargs)
+
+
+
 
 
 

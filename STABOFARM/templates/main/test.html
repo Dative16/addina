@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CKUP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+        }
+
+        .dashboard-content {
+            margin-left: 250px; /* Adjust based on sidebar width */
+            padding: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .stat-box h3 {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .stat-box .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .recent-orders {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .status.pending { background: #fff3cd; color: #856404; }
+        .status.completed { background: #d4edda; color: #155724; }
+        .status.delivery { background: #cce5ff; color: #004085; }
+        .status.canceled { background: #f8d7da; color: #721c24; }
+
+        #salesChart {
+            height: 400px;
+            margin-top: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-content">
+        <div class="stats-grid">
+            <div class="stat-box">
+                <h3>Today's Orders</h3>
+                <div class="value" id="todayOrders">12</div>
+            </div>
+            <div class="stat-box">
+                <h3>All Orders</h3>
+                <div class="value" id="totalOrders">200</div>
+            </div>
+            <div class="stat-box">
+                <h3>Today's Sales</h3>
+                <div class="value" id="todaySales">$540.00</div>
+            </div>
+            <div class="stat-box">
+                <h3>Completed Orders</h3>
+                <div class="value" id="completedOrders">120</div>
+            </div>
+            <div class="stat-box">
+                <h3>Pending Orders</h3>
+                <div class="value" id="pendingOrders">45</div>
+            </div>
+        </div>
+
+        <div id="salesChart"></div>
+
+        <div class="recent-orders">
+            <h2>Recent Orders</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTable">
+                    <!-- Orders will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+    <script>
+        // Recent Orders Data
+        const orders = [
+            { product: "Contrasting Sweatshirt", price: 45.00, status: "pending" },
+            { product: "Faux-Leather Trousers", price: 45.00, status: "delivery" },
+            { product: "V-Neck Knitted Top", price: 45.00, status: "completed" },
+            { product: "Contrasting Sweatshirt", price: 45.00, status: "pending" },
+            { product: "Faux-Leather Trousers", price: 45.00, status: "delivery" },
+            { product: "V-Neck Knitted Top", price: 45.00, status: "canceled" },
+            // Add more orders as needed
+        ];
+
+        // Populate orders table
+        const tbody = document.getElementById('ordersTable');
+        orders.forEach(order => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${order.product}</td>
+                    <td>$${order.price.toFixed(2)}</td>
+                    <td><span class="status ${order.status}">${order.status}</span></td>
+                    <td><button class="view-btn">View</button></td>
+                </tr>
+            `;
+        });
+
+        // Sales Chart
+        const chart = new CanvasJS.Chart("salesChart", {
+            animationEnabled: true,
+            theme: "light2",
+            title: { text: "Daily Sales" },
+            axisX: { title: "Date" },
+            axisY: { title: "Sales ($)" },
+            data: [{
+                type: "line",
+                indexLabelFontSize: 16,
+                dataPoints: [
+                    { x: new Date(2024, 0, 1), y: 450 },
+                    { x: new Date(2024, 0, 2), y: 900 },
+                    { x: new Date(2024, 0, 3), y: 675 },
+                    { x: new Date(2024, 0, 4), y: 1200 },
+                    { x: new Date(2024, 0, 5), y: 850 },
+                ]
+            }]
+        });
+        chart.render();
+    </script>
+</body>
+</html>

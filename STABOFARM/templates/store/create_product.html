@@ -1,0 +1,91 @@
+
+{% extends "main/dashboard_side.html" %}
+
+{% load static %}
+{% block title %}Create Product{% endblock title %}
+
+
+{% block content %}
+<div class="dashboard-content">
+<div class="form-container">
+    <h2 class="form-title">{% if product %}Edit{% else %}Create{% endif %} Product</h2>
+    <form method="post" enctype="multipart/form-data" id="productForm">
+        {% csrf_token %}
+        
+        <div class="form-grid">
+            <!-- Left Column -->
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="id_product_name">Product Name</label>
+                    {{ form.product_name }}
+                    <span class="form-error">{{ form.product_name.errors }}</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_category">Category</label>
+                    {{ form.category }}
+                    <span class="form-error">{{ form.category.errors }}</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_description">Description</label>
+                    {{ form.description }}
+                    <span class="form-error">{{ form.description.errors }}</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_image">Product Image</label>
+                    <div class="file-upload">
+                        <input type="file" name="image" id="id_image" accept="image/*">
+                        <div class="preview-container" id="imagePreview"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="form-column">
+                <div class="price-grid">
+                    <div class="form-group">
+                        <label for="id_price">Selling Price</label>
+                        {{ form.price }}
+                        <span class="form-error">{{ form.price.errors }}</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_buy_price">Cost Price</label>
+                        {{ form.buy_price }}
+                        <span class="form-error">{{ form.buy_price.errors }}</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_stock">Stock Quantity</label>
+                    {{ form.stock }}
+                    <span class="form-error">{{ form.stock.errors }}</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_expire_date">Expiration Date</label>
+                    {{ form.expire_date }}
+                </div>
+
+                <div class="form-group switch-group">
+                    <label class="switch">
+                        {{ form.is_available }}
+                        <span class="slider"></span>
+                    </label>
+                    <span class="switch-label">Available for Sale</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                <span class="material-symbols-rounded">save</span>
+                Save Product
+            </button>
+        </div>
+    </form>
+</div>
+</div>
+{% endblock %}

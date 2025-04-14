@@ -1,54 +1,103 @@
-from typing import Any
-from .models import Shop, Product, Category, ProductVariation
 from django import forms
+from .models import Product, Shop, VariationCategory, Variation, ProductVariation, ReviewRating, ProductGallery, Category
+from django.utils.text import slugify
 
-class ShopForm(forms.ModelForm):
-    class Meta:
-        model = Shop
-        fields = ['name', 'location']
-
-
-    def clean(self):
-        cleaned_data = super(ShopForm, self).clean()
 
 class ProductForm(forms.ModelForm):
-    # image = forms.ImageField(required=False, error_messages={'invalid': ("Image files only")}, widget=forms.FileInput)
-    description = forms.CharField(required=False, error_messages={"Required": ("This field is Required")}, widget=forms.Textarea(attrs={
-        'placeholder': 'eg. Product descriptions'}
-    ))
-    expire_date = forms.DateField(required=False, error_messages={"Required": ("date formart must be of YYYY-MM-DD")}, widget=forms.DateInput(attrs={
-        "placeholder": "eg. 2024-09-28 (YYYY-MM-DD)", 'type': 'date'
-    }))
     class Meta:
         model = Product
-        fields = ['product_name', 'price', 'stock','buy_price']
+        fields = [ 'shop','product_name', 'category', 'description', 'price', 'image', 
+                 'stock', 'expire_date', 'buy_price', 'is_available']
+        widgets = {
+            'expire_date': forms.DateInput(attrs={'type': 'date'}),
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }
     
     def __init__(self, *args, **kwargs):
-        super(ProductForm, self).__init__(*args, **kwargs)
-        self.fields['product_name'].widget.attrs['placeholder'] = 'eg. Samsung Galaxy S10e'
-        self.fields['price'].widget.attrs['placeholder'] = 'eg. 1234.00'
-        self.fields['stock'].widget.attrs['placeholder'] = 'eg. 1000'
-        self.fields['buy_price'].widget.attrs['placeholder'] = 'eg. 1000.00'
-    
-    def clean(self):
-        cleaned_data = super(ProductForm, self).clean()
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        if user:
+            self.fields['shop'].queryset = Shop.objects.filter(user=user)
+            self.fields['shop'].required = True
+            self.fields['shop'].label = "Select Shop"
+            self.fields['shop'].empty_label = None
 
-class ProductEditForm(forms.ModelForm):
-    image = forms.ImageField(required=False, error_messages={'invalid': ("Image files only")},
-                                       widget=forms.FileInput)
-    description = forms.CharField(required=False, error_messages={"Required": ("This field is Required")}, widget=forms.Textarea())
+class VariationCategoryForm(forms.ModelForm):
     class Meta:
-        model = Product
-        fields = ['product_name', 'price', 'stock','buy_price','image', 'description', 'expire_date','category', 'image']
+        model = VariationCategory
+        fields = ['name']
 
-
+class VariationForm(forms.ModelForm):
+    class Meta:
+        model = Variation
+        fields = ['variation_category', 'variation_value', 'is_active']
 
 class ProductVariationForm(forms.ModelForm):
     class Meta:
         model = ProductVariation
-        fields = ['product', 'price', 'stock', 'variations']   
+        fields = ['product', 'variations', 'price', 'stock', 'is_active']
+        widgets = {
+            'variations': forms.CheckboxSelectMultiple(),
+        }
 
+class ReviewRatingForm(forms.ModelForm):
+    class Meta:
+        model = ReviewRating
+        fields = ['subject', 'review', 'rating']
+        widgets = {
+            'rating': forms.NumberInput(attrs={'min': 1, 'max': 5, 'step': 0.5}),
+        }
 
-class EmailForm(forms.Form):
-    email = forms.EmailField(required=True)
-    message = forms.CharField(widget=forms.Textarea, required=True)
+class ProductGalleryForm(forms.ModelForm):
+    class Meta:
+        model = ProductGallery
+        fields = ['image']
+        
+class DynamicCategoryForm(forms.ModelForm):
+    new_category = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Type to search or create new category',
+            'autocomplete': 'off'
+        })
+    )
+
+    class Meta:
+        model = Category
+        fields = ['parent', 'category_name']
+        widgets = {
+            'category_name': forms.HiddenInput(),
+            'parent': forms.HiddenInput()
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category_name'].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_category = cleaned_data.get('new_category')
+        existing_category = cleaned_data.get('category_name')
+
+        if not existing_category and not new_category:
+            raise forms.ValidationError("Category is required")
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        new_category = self.cleaned_data.get('new_category')
+        
+        if new_category:
+            category, created = Category.objects.get_or_create(
+                category_name__iexact=new_category.strip(),
+                defaults={
+                    'category_name': new_category.strip(),
+                    'slug': slugify(new_category.strip())
+                }
+            )
+            instance = category
+        if commit:
+            instance.save()
+        return instance

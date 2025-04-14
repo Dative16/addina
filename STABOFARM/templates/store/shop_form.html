@@ -1,0 +1,36 @@
+
+{% extends "main/dashboard_side.html" %}
+
+{% load static %}
+{% block title %}Create Shop{% endblock title %}
+
+
+{% block content %}
+<div class="dashboard-content">
+<div class="form-container">
+    <h2>Create New Shop</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Shop Name</label>
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
+            <div class="form-group">
+                <label>Location</label>
+                {{ form.location }}
+            </div>
+            <div class="form-group full-width">
+                <label>Description</label>
+                {{ form.description }}
+            </div>
+        </div>
+        <button type="submit" class="btn-primary">
+            <span class="material-symbols-rounded">storefront</span>
+            Create Shop
+        </button>
+    </form>
+</div>
+</div>
+{% endblock %}

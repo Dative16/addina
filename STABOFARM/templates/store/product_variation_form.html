@@ -1,0 +1,68 @@
+{% extends "main/dashboard_side.html" %}
+
+{% load static %}
+{% block title %}Create Product Variation{% endblock title %}
+
+
+{% block content %}
+<div class="dashboard-content">
+<div class="form-container">
+    <h2>{% if object %}Edit{% else %}Create{% endif %} Product Variation</h2>
+    <form method="post" id="productVariationForm">
+        {% csrf_token %}
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Product</label>
+                <select name="product" required>
+                    <option value="">Select Product</option>
+                    {% for product in products %}
+                    <option value="{{ product.id }}"
+                        {% if object.product.id == product.id %}selected{% endif %}>
+                        {{ product.product_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Variations</label>
+                <div class="multi-select">
+                    {% for variation in variations %}
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="variations" 
+                            value="{{ variation.id }}"
+                            {% if variation in object.variations.all %}checked{% endif %}>
+                        {{ variation.variation_category.name }}: {{ variation.variation_value }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="price-group">
+                <div class="form-group">
+                    <label>Additional Price</label>
+                    <input type="number" name="price" step="0.01"
+                        value="{{ object.price|default:'0' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Stock</label>
+                    <input type="number" name="stock" 
+                        value="{{ object.stock|default:'0' }}" required>
+                </div>
+            </div>
+
+            <div class="form-group switch-group">
+                <label class="switch">
+                    <input type="checkbox" name="is_active" 
+                        {% if object.is_active or not object %}checked{% endif %}>
+                    <span class="slider"></span>
+                </label>
+                <span class="switch-label">Active</span>
+            </div>
+        </div>
+        <button type="submit" class="btn-primary">Save Variation</button>
+    </form>
+</div>
+</div>
+{% endblock %}
