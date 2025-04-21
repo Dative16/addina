@@ -236,9 +236,9 @@
                                   <li class="has-dropdown">
                                      <a href="{% url 'home' %}">Home</a>
                                      <ul class="submenu">
-                                        <li><a href="pharmacy.html">Pharmacy Store</a></li>
-                                        <li><a href="{% url 'home' %}">Furniture Store</a></li>
-                                        <li><a href="grocery.html">Grocery Store</a></li>
+                                        {% for category in links %}
+                                        <li><a href="{{ category.get_url }}">{{ category.category_name |capfirst }} </a></li>
+                                           {% endfor %}
                                      </ul>
                                   </li>
                                   <li>

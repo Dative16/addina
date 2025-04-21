@@ -59,7 +59,6 @@ def store(request, category_slug=None):
     return render(request, 'store/store.html', context)
 
 
-
 def search(request):
     if 'keyword' in request.GET:
         keyword = request.GET['keyword']
@@ -90,21 +89,40 @@ class ProductCreateView(CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'store/create_product.html'
-    
+    success_url = reverse_lazy('product_list')
+
     def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, "You need to login first")
+            return redirect('login')
+            
         if not request.user.shops.exists():
             messages.warning(request, 'You need to create a shop first')
             return redirect('shop_create')
+            
         return super().dispatch(request, *args, **kwargs)
-    
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
-    
+
     def form_valid(self, form):
-        form.instance.shop = form.cleaned_data['shop']
-        return super().form_valid(form)
+        try:
+            response = super().form_valid(form)
+            messages.success(self.request, 
+                f"Product '{self.object.product_name}' created successfully!"
+            )
+            return response
+        except Exception as e:
+            messages.error(self.request, f"Error creating product: {str(e)}")
+            return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 
+            "Please correct the errors below"
+        )
+        return super().form_invalid(form)
 
 class ProductUpdateView(UpdateView):
     model = Product
@@ -161,6 +179,7 @@ class CategoryCreateView(CreateView):
     model = Category
     form_class = DynamicCategoryForm
     template_name = 'store/create_category.html'
+    success_url = reverse_lazy('dashboard')
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -323,7 +342,7 @@ def show_single_product(request, product_id):
         'product': product,
         'product_variation':product_variation,
         }
-    return render(request, 'store/single_product.html', context)
+    return render(request, 'store/product-details.html', context)
 
 
 
@@ -354,11 +373,12 @@ class ProductListView(ListView):
     template_name = 'store/adm_product_list.html'
     context_object_name = 'products'
     paginate_by = 10
-
+    
     def get_queryset(self):
+        shop = Shop.objects.get(user=self.request.user)
         queryset = super().get_queryset()
         # Filter products by the user's shop (assuming shop is linked to user)
-        queryset = queryset.filter(shop=self.request.user.shop)
+        queryset = queryset.filter(shop=shop)
         
         # Add search functionality
         search_query = self.request.GET.get('search')
@@ -371,17 +391,18 @@ class ProductListView(ListView):
         return queryset.order_by('-modified_date')
 
     def get_context_data(self, **kwargs):
+        shop = Shop.objects.get(user=self.request.user)
         context = super().get_context_data(**kwargs)
         # Add search query to context
         context['search_query'] = self.request.GET.get('search', '')
         # Add counts for dashboard
-        context['total_products'] = Product.objects.filter(shop=self.request.user.shop).count()
-        context['active_products'] = Product.objects.filter(shop=self.request.user.shop, is_available=True).count()
+        context['total_products'] = Product.objects.filter(shop=shop).count()
+        context['active_products'] = Product.objects.filter(shop=shop, is_available=True).count()
         return context
 
 class ProductDetailView(DetailView):
     model = Product
-    template_name = 'store/adm_product_detail.html'
+    template_name = 'store/adm_product_detail.html' 
     context_object_name = 'product'
 
     def get_context_data(self, **kwargs):

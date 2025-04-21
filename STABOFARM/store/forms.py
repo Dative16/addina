@@ -6,22 +6,40 @@ from django.utils.text import slugify
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = [ 'shop','product_name', 'category', 'description', 'price', 'image', 
-                 'stock', 'expire_date', 'buy_price', 'is_available']
+        fields = ['shop', 'product_name', 'category', 'description', 
+                 'price', 'image', 'stock', 'expire_date', 
+                 'buy_price', 'is_available']
         widgets = {
             'expire_date': forms.DateInput(attrs={'type': 'date'}),
             'description': forms.Textarea(attrs={'rows': 3}),
         }
-    
+
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
+        self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         
-        if user:
-            self.fields['shop'].queryset = Shop.objects.filter(user=user)
+        if self.user:
+            self.fields['shop'].queryset = Shop.objects.filter(user=self.user)
             self.fields['shop'].required = True
-            self.fields['shop'].label = "Select Shop"
-            self.fields['shop'].empty_label = None
+            self.fields['shop'].empty_label = "Select Your Shop"
+
+    def clean_shop(self):
+        shop = self.cleaned_data.get('shop')
+        if shop and shop.user != self.user:
+            raise forms.ValidationError("You don't own this shop")
+        return shop
+
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if price <= 0:
+            raise forms.ValidationError("Price must be greater than zero")
+        return price
+
+    def clean_stock(self):
+        stock = self.cleaned_data.get('stock')
+        if stock < 0:
+            raise forms.ValidationError("Stock cannot be negative")
+        return stock
 
 class VariationCategoryForm(forms.ModelForm):
     class Meta:

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from store.models import Product
+from store.models import Product, ProductVariation
 from .forms import *
 from .models import Account
 from django.contrib import messages, auth
@@ -21,9 +21,24 @@ from django.core.mail import EmailMessage
 # Create your views here.
 def home(request):
     products = Product.objects.all().filter(is_available=True)
-    context = {'products': products, }
+    products_news = Product.objects.all().filter(is_available=True)[:3]
+    products_offs = Product.objects.all().filter(is_available=True)[:2]
+    context = {'products': products,'products_news':products_news, 'products_offs':products_offs }
     return render(request, 'store/index.html', context)
 
+def show_single_product(request, pk):
+    try:
+        product = get_object_or_404(Product, id=pk)
+        print(product.image.url)
+        product_variation = ProductVariation.objects.filter(product=product)
+    except:
+        pass
+
+    context = {
+        'product': product,
+        'product_variation':product_variation,
+        }
+    return render(request, 'store/product-details.html', context)
 
 def register(request):
     if request.method == 'POST':
